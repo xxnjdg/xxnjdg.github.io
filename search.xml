@@ -18,6 +18,8 @@
     <title>test</title>
     <url>/2020/12/26/test/</url>
     <content><![CDATA[<h1 id="这是标题"><a href="#这是标题" class="headerlink" title="这是标题"></a>这是标题</h1><p>这是一个测试文档</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p><img src="/2020/12/26/test/1.png" alt="ss"></p>
 <h2 id="这也是标题"><a href="#这也是标题" class="headerlink" title="这也是标题"></a>这也是标题</h2>]]></content>
       <categories>
