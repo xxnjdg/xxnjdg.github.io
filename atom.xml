@@ -6,7 +6,7 @@
   <link href="https://xxnjdg.github.io/atom.xml" rel="self"/>
   
   <link href="https://xxnjdg.github.io/"/>
-  <updated>2020-12-26T12:45:18.393Z</updated>
+  <updated>2020-12-26T16:52:59.907Z</updated>
   <id>https://xxnjdg.github.io/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>the-art-of-java-concurrency-programming</title>
+    <link href="https://xxnjdg.github.io/2020/12/27/the-art-of-java-concurrency-programming/"/>
+    <id>https://xxnjdg.github.io/2020/12/27/the-art-of-java-concurrency-programming/</id>
+    <published>2020-12-26T16:48:37.000Z</published>
+    <updated>2020-12-26T16:52:59.907Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="第1章-并发编程的挑战"><a href="#第1章-并发编程的挑战" class="headerlink" title="第1章 并发编程的挑战"></a>第1章 并发编程的挑战</h1><p>上下文切换的问题</p><p>死锁的问题</p><p>以及受限于硬件和软件的资源限制问题</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;第1章-并发编程的挑战&quot;&gt;&lt;a href=&quot;#第1章-并发编程的挑战&quot; class=&quot;headerlink&quot; title=&quot;第1章 并发编程的挑战&quot;&gt;&lt;/a&gt;第1章 并发编程的挑战&lt;/h1&gt;&lt;p&gt;上下文切换的问题&lt;/p&gt;
+&lt;p&gt;死锁的问题&lt;/p&gt;
+&lt;p&gt;以及受限于</summary>
+      
+    
+    
+    
+    <category term="并发编程" scheme="https://xxnjdg.github.io/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/"/>
+    
+    
+    <category term="并发编程" scheme="https://xxnjdg.github.io/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/"/>
+    
+  </entry>
   
   <entry>
     <title>test1</title>
@@ -42,9 +68,9 @@
     <link href="https://xxnjdg.github.io/2020/12/26/test/"/>
     <id>https://xxnjdg.github.io/2020/12/26/test/</id>
     <published>2020-12-26T08:03:32.000Z</published>
-    <updated>2020-12-26T12:33:29.497Z</updated>
+    <updated>2020-12-26T14:41:49.216Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="这是标题"><a href="#这是标题" class="headerlink" title="这是标题"></a>这是标题</h1><p>这是一个测试文档</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><img src="/2020/12/26/test/1.png" alt="ss"></p><h2 id="这也是标题"><a href="#这也是标题" class="headerlink" title="这也是标题"></a>这也是标题</h2>]]></content>
+    <content type="html"><![CDATA[<h1 id="这是标题"><a href="#这是标题" class="headerlink" title="这是标题"></a>这是标题</h1><p>这是一个测试文档</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">volatile</span> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><img src="/2020/12/26/test/1.png" alt="ss"></p><h2 id="这也是标题"><a href="#这也是标题" class="headerlink" title="这也是标题"></a>这也是标题</h2>]]></content>
     
     
       
@@ -67,9 +93,9 @@
     <link href="https://xxnjdg.github.io/2020/12/26/hello-world/"/>
     <id>https://xxnjdg.github.io/2020/12/26/hello-world/</id>
     <published>2020-12-26T06:56:30.821Z</published>
-    <updated>2020-12-26T12:33:29.395Z</updated>
+    <updated>2020-12-26T13:17:32.400Z</updated>
     
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>使用主题 Butterfly</p><p><a href="https://www.cnblogs.com/thanksblog/p/12900165.html">https://www.cnblogs.com/thanksblog/p/12900165.html</a><br><a href="https://blog.csdn.net/xjm850552586/article/details/84101345">https://blog.csdn.net/xjm850552586/article/details/84101345</a></p><p>文件头部</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: test</span><br><span class="line">date: 2020-12-26 16:03:32</span><br><span class="line">categories: </span><br><span class="line">- 分类1</span><br><span class="line">tags:</span><br><span class="line">- 标签1</span><br><span class="line">cover: /2020/12/26/test/1.png # 封面图</span><br><span class="line">sticky: 1 # 顶置</span><br><span class="line">---</span><br></pre></td></tr></table></figure>]]></content>
     
     
       
