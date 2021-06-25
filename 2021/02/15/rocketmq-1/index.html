@@ -1,0 +1,759 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>namesrv笔记 | 有间博客</title><meta name="keywords" content="rocketmq"><meta name="author" content="xxnjdg"><meta name="copyright" content="xxnjdg"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="org.apache.rocketmq.namesrv.NamesrvStartup程序入口 定时任务1234567891011121314151617&#x2F;&#x2F;定时扫描不可用的broker，同时删除不可用的broker，同时打印相关日志        this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() &amp;#123;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="namesrv笔记">
+<meta property="og:url" content="https://xxnjdg.github.io/2021/02/15/rocketmq-1/index.html">
+<meta property="og:site_name" content="有间博客">
+<meta property="og:description" content="org.apache.rocketmq.namesrv.NamesrvStartup程序入口 定时任务1234567891011121314151617&#x2F;&#x2F;定时扫描不可用的broker，同时删除不可用的broker，同时打印相关日志        this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() &amp;#123;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg">
+<meta property="article:published_time" content="2021-02-15T07:27:27.000Z">
+<meta property="article:modified_time" content="2021-03-03T12:19:17.496Z">
+<meta property="article:author" content="xxnjdg">
+<meta property="article:tag" content="rocketmq">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://xxnjdg.github.io/2021/02/15/rocketmq-1/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-03-03 20:19:17'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="有间博客" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/null" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首頁</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 時間軸</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 標籤</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分類</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清單</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音樂</span></a></li><li><a class="site-page" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 電影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友鏈</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 關於</span></a></div></div></div></div><div id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">有间博客</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首頁</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 時間軸</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 標籤</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分類</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清單</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音樂</span></a></li><li><a class="site-page" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 電影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友鏈</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 關於</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">namesrv笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2021-02-15T07:27:27.000Z" title="Created 2021-02-15 15:27:27">2021-02-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2021-03-03T12:19:17.496Z" title="Updated 2021-03-03 20:19:17">2021-03-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/mq/">mq</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="org-apache-rocketmq-namesrv-NamesrvStartup"><a href="#org-apache-rocketmq-namesrv-NamesrvStartup" class="headerlink" title="org.apache.rocketmq.namesrv.NamesrvStartup"></a>org.apache.rocketmq.namesrv.NamesrvStartup</h1><p>程序入口</p>
+<h2 id="定时任务"><a href="#定时任务" class="headerlink" title="定时任务"></a>定时任务</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//定时扫描不可用的broker，同时删除不可用的broker，同时打印相关日志</span><br><span class="line">        this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                NamesrvController.this.routeInfoManager.scanNotActiveBroker();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, 5, 10, TimeUnit.SECONDS);</span><br><span class="line"></span><br><span class="line">        //定时将kv的配置信息输出到info日志中</span><br><span class="line">        this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                NamesrvController.this.kvConfigManager.printAllPeriodically();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, 1, 10, TimeUnit.MINUTES);</span><br></pre></td></tr></table></figure>
+<p>requestHeader.setBrokerAddr(brokerAddr);<br>requestHeader.setBrokerId(brokerId);<br>requestHeader.setBrokerName(brokerName);<br>requestHeader.setClusterName(clusterName);<br>requestHeader.setHaServerAddr(haServerAddr);<br>requestHeader.setCompressed(compressed);<br>requestHeader.setBodyCrc32(bodyCrc32);</p>
+<p>requestBody.setTopicConfigSerializeWrapper(topicConfigWrapper);<br>requestBody.setFilterServerList(filterServerList);</p>
+<h1 id="Broker"><a href="#Broker" class="headerlink" title="Broker"></a>Broker</h1><h2 id="定时任务-1"><a href="#定时任务-1" class="headerlink" title="定时任务"></a>定时任务</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">//每30秒循环 Broker 发送心跳包</span><br><span class="line">this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    BrokerController.this.registerBrokerAll(true, false, brokerConfig.isForceRegister());</span><br><span class="line">                &#125; catch (Throwable e) &#123;</span><br><span class="line">                    log.error(&quot;registerBrokerAll Exception&quot;, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">&#125;, 1000 * 10, Math.max(10000, Math.min(brokerConfig.getRegisterNameServerPeriod(), 60000)), TimeUnit.MILLISECONDS);</span><br></pre></td></tr></table></figure>
+<p>消息队列如何进行负载 ？<br>消息发送如何实现高可用 ？<br>批量消息发送如何实现一致性？<br>2 ）消息队列负载机制<br>消息生产者在发送消息时，如果本地路由表中未缓存 topic 的路由信息，向 NameServer 发送获取路由信息请求，更新本地路由信息表，并且消息生产者每隔 30s 从 NameServer 更新路由表 。<br>3 ）消息发送异常机制<br>消息发送高可用主要通过两个手段 ： 重试与 Broker 规避 。 Brok巳r 规避就是在一次消息<br>发送过程中发现错误，在某一时间段内，消息生产者不会选择该 Broker（消息服务器）上的<br>消息队列，提高发送消息的成功率 。<br>4 ）批量消息发送<br>RocketMQ 支持将 同一主题下 的多条消息一次性发送到消息服务端 。</p>
+<p>SendMessageRequestHeader requestHeader = new SendMessageRequestHeader();<br>//消息发送组<br>requestHeader.setProducerGroup(this.defaultMQProducer.getProducerGroup());<br>//消息的topic<br>requestHeader.setTopic(msg.getTopic());<br>//消息的默认topic<br>requestHeader.setDefaultTopic(this.defaultMQProducer.getCreateTopicKey());<br>//消息的默认queue数量<br>requestHeader.setDefaultTopicQueueNums(this.defaultMQProducer.getDefaultTopicQueueNums());<br>//消息发送的queueid<br>requestHeader.setQueueId(mq.getQueueId());<br>//特殊标识<br>requestHeader.setSysFlag(sysFlag);<br>//消息创建的时间戳<br>requestHeader.setBornTimestamp(System.currentTimeMillis());<br>//标识<br>requestHeader.setFlag(msg.getFlag());<br>//消息的扩展属性<br>requestHeader.setProperties(MessageDecoder.messageProperties2String(msg.getProperties()));<br>//消息的消费<br>requestHeader.setReconsumeTimes(0);<br>//模型<br>requestHeader.setUnitMode(this.isUnitMode());<br>//批量<br>requestHeader.setBatch(msg instanceof MessageBatch);</p>
+<p>response.setOpaque(request.getOpaque());<br>response.addExtField(MessageConst.PROPERTY_MSG_REGION, this.brokerController.getBrokerConfig().getRegionId());<br>response.addExtField(MessageConst.PROPERTY_TRACE_SWITCH, String.valueOf(this.brokerController.getBrokerConfig().isTraceOn()));<br>response.setCode(ResponseCode.SUCCESS);<br>response.setRemark(null);<br>responseHeader.setMsgId(putMessageResult.getAppendMessageResult().getMsgId());<br>responseHeader.setQueueId(queueIdInt);<br>responseHeader.setQueueOffset(putMessageResult.getAppendMessageResult().getLogicsOffset());</p>
+<p>MessageAccessor.putProperty(msgInner, MessageConst.PROPERTY_CLUSTER, clusterName);</p>
+<p>MessageAccessor.putProperty(msgExt, MessageConst.PROPERTY_RETRY_TOPIC, msgExt.getTopic());<br>this.putProperty(MessageConst.PROPERTY_WAIT_STORE_MSG_OK, false);<br>this.putProperty(MessageConst.PROPERTY_DELAY_TIME_LEVEL, 3);<br>putProperty(msg, MessageConst.PROPERTY_ORIGIN_MESSAGE_ID, msgExt.getMsgId());<br>MessageAccessor.putProperty(msg, MessageConst.PROPERTY_REAL_TOPIC, msg.getTopic());<br>MessageAccessor.putProperty(msg, MessageConst.PROPERTY_REAL_QUEUE_ID, String.valueOf(msg.getQueueId()));<br>topic = TopicValidator.RMQ_SYS_SCHEDULE_TOPIC;<br>queueId = ScheduleMessageService.delayLevel2QueueId(msg.getDelayTimeLevel());</p>
+<p>1 ) TOTALSIZE ： 该消息条目总长度 ， 4 字节 。<br>2 ) MAGICCODE ： 魔数， 4 字节 。 固定值 Oxdaa320a7 。<br>3 ) BODYCRC ： 消息体 ere 校验码， 4 字节 。<br>4 ) QUEUEID ： 消息消费队列 ID , 4 字节 。<br>5 ) FLAG ： 消息 FLAG , RocketMQ 不做处理 ， 供应用程序使用，默认 4 字节 。<br>6 ) QUEUEOFFSET ：消息在消息消费队列的偏移量 ， 8 字节 。<br>7 ) PHYSICALOFFSET ： 消息在 CommitLog 文件中的偏移量 ， 8 字节 。<br>8 ) SYSFLAG ： 消息系统 Flag ，例如是否压缩 、 是否是事务消息等 ， 4 字节 。<br>9 ) BORNTIMESTAMP ： 消息生产者调用消息发送 API 的时间戳， 8 字节 。<br>10 ) BORNHOST ：消息发送者 IP 、端 口 号， 8 字节 。<br>11 ) STORETIMESTAMP ： 消息存储时间戳， 8 字节 。<br>12 ) STOREHOSTADDRESS: Broker 服务器 IP＋ 端 口 号， 8 字节 。<br>13 ） 阻CONSUMETIMES ： 消息重试次数， 4 字节 。<br>14 ) Prepared Transaction Offset ： 事务消息物理偏移量 ， 8 字节 。<br>15 ) BodyLength ：消息体长度， 4 字节 。<br>16 ) Body ： 消息体内容，长度为 bodyLenth 中存储的值。<br>17 ) TopieLength ： 主题存储长度， 1 字节 ，表示主题名称不能超过 255 个字符 。<br>18) Topie ： 主题，长度为 TopieLength 中存储的值。<br>    19 ) PropertiesLength ： 消息属性长度 ， 2 字节 ， 表示消息属性长度不能超过 6 553 6 个<br>    字符 。<br>    20 ) Properties ： 消息属性，长度为 PropertiesLength 中存储的值 。</p>
+<p>DLedgerMmapFileStore.AppendHook appendHook = (entry, buffer, bodyOffset) -&gt; {<br>assert bodyOffset == DLedgerEntry.BODY_OFFSET;<br>buffer.position(buffer.position() + bodyOffset + MessageDecoder.PHY_POS_POSITION);<br>buffer.putLong(entry.getPos() + bodyOffset);<br>};<br>dLedgerFileStore.addAppendHook(appendHook);</p>
+<h1 id="org-apache-rocketmq-common-namesrv-NamesrvConfig"><a href="#org-apache-rocketmq-common-namesrv-NamesrvConfig" class="headerlink" title="org.apache.rocketmq.common.namesrv.NamesrvConfig"></a>org.apache.rocketmq.common.namesrv.NamesrvConfig</h1><table>
+    <tr>
+        <td>配置项</td> 
+        <td>key</td>
+        <td>默认值</td> 
+        <td>说明</td> 
+    </tr>
+    <tr>
+        <td>rocketmq 主目录</td>
+        <td>rocketmqHome</td>
+        <td>System.getProperty(MixAll.ROCKETMQ_HOME_PROPERTY, System.getenv(MixAll.ROCKETMQ_HOME_ENV))</td>
+        <td>可以通过 -Drocketmq.home.dir=path 或通过设置环境变量 ROCKETMQ_HOME 来配置 RocketMQ 的主目录</td>
+    </tr>
+    <tr>
+        <td>NameServer存储 KV 配置属性的持久化路径</td>
+        <td>kvConfigPath</td>
+        <td>System.getProperty("user.home") + File.separator + "namesrv" + File.separator + "kvConfig.json"</td>
+        <td>NameServer 存储 KV 配置属性的持久化路径</td>
+    </tr>
+    <tr>
+        <td>NameServer 默认配置文件路径</td>
+        <td>configStorePath</td>
+        <td>System.getProperty("user.home") + File.separator + "namesrv" + File.separator + "namesrv.properties"</td>
+        <td>NameServer 默认配置文件路径,不生效. NameServer 启动时如果要通过配置文件配置 NameServer 启动属性的话，请使用 -c 选项</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>productEnvName</td>
+        <td>center</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>集群测试</td>
+        <td>clusterTest</td>
+        <td>false</td>
+        <td>是否开启集群测试</td>
+    </tr>
+    <tr>
+        <td>顺序消息</td>
+        <td>orderMessageEnable</td>
+        <td>false</td>
+        <td>是否支持顺序消息，默认是不支持</td>
+    </tr>
+</table>
+
+<h1 id="org-apache-rocketmq-remoting-netty-NettyServerConfig"><a href="#org-apache-rocketmq-remoting-netty-NettyServerConfig" class="headerlink" title="org.apache.rocketmq.remoting.netty.NettyServerConfig"></a>org.apache.rocketmq.remoting.netty.NettyServerConfig</h1><table>
+    <tr>
+        <td>配置项</td> 
+        <td>默认值类型</td>
+        <td>默认值</td> 
+        <td>说明</td> 
+    </tr>
+    <tr>
+        <td>listenPort</td>
+        <td>int</td>
+        <td>8888</td>
+        <td>服务端监听端口，NameServer 监昕端口，该值默认会被初始化为 9876</td>
+    </tr>
+    <tr>
+        <td>serverWorkerThreads</td>
+        <td>int</td>
+        <td>8</td>
+        <td> Netty 业务线程池线程个数</td>
+    </tr>
+    <tr>
+        <td>serverCallbackExecutorThreads</td>
+        <td>int</td>
+        <td>0</td>
+        <td>Netty public 任务线程池线程个数，Netty 网络设计，根据业务类型会创建不同的线程池，比如处理消息发送、消息消费、心跳检测等。如果该业务类型（RequestCode）未注册线程池，则由 public 线程池执行</td>
+    </tr>
+    <tr>
+        <td>serverSelectorThreads</td>
+        <td>int</td>
+        <td>3</td>
+        <td>IO线程池线程个数，主要是 NameServer 、 Broker 端解析请求、返回相应的线程个数，这类线程主要是处理网络请求的，解析请求包，然后转发到各个业务线程池完成具体的业务操作，然后将结果再返回调用方</td>
+    </tr>
+    <tr>
+        <td>serverOnewaySemaphoreValue</td>
+        <td>int</td>
+        <td>256</td>
+        <td>send oneway 消息请求井发度（ Broker 端参数）</td>
+    </tr>
+    <tr>
+        <td>serverAsyncSemaphoreValue</td>
+        <td>int</td>
+        <td>64</td>
+        <td>异步消息发送最大并发度（ Broker 端参数）</td>
+    </tr>
+    <tr>
+        <td>serverChannelMaxIdleTimeSeconds</td>
+        <td>int</td>
+        <td>120</td>
+        <td>网络连接最大空闲时间，默认120s。如果连接空闲时间超过该参数设置的值，连接将被关闭</td>
+    </tr>
+    <tr>
+        <td>serverSocketSndBufSize</td>
+        <td>int</td>
+        <td>65535</td>
+        <td>网络 socket 发送缓存区大小，默认64k</td>
+    </tr>
+    <tr>
+        <td>serverSocketRcvBufSize</td>
+        <td>int</td>
+        <td>65535</td>
+        <td>网络 socket 接收缓存区大小，默认64k</td>
+    </tr>
+    <tr>
+        <td>serverPooledByteBufAllocatorEnable</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td>ByteBuffer 是否开启缓存，建议开启</td>
+    </tr>
+    <tr>
+        <td>useEpollNativeSelector</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td>是否启用 EpollIO 模型，Linux 环境建议开启</td>
+    </tr>
+</table>
+
+
+<table>
+    <tr>
+        <td>rocketmqHome</td>
+        <td>class java.lang.String</td>
+        <td>System.getProperty(MixAll.ROCKETMQ_HOME_PROPERTY, System.getenv(MixAll.ROCKETMQ_HOME_ENV))</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>namesrvAddr</td>
+        <td>class java.lang.String</td>
+        <td>System.getProperty(MixAll.NAMESRV_ADDR_PROPERTY, System.getenv(MixAll.NAMESRV_ADDR_ENV))</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>brokerIP1</td>
+        <td>class java.lang.String</td>
+        <td>RemotingUtil.getLocalAddress()</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>brokerIP2</td>
+        <td>class java.lang.String</td>
+        <td>RemotingUtil.getLocalAddress()</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>brokerName</td>
+        <td>class java.lang.String</td>
+        <td>localHostName()</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>brokerClusterName</td>
+        <td>class java.lang.String</td>
+        <td>DefaultCluster</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>brokerId</td>
+        <td>long</td>
+        <td>1</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>brokerPermission</td>
+        <td>int</td>
+        <td>1</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>defaultTopicQueueNums</td>
+        <td>int</td>
+        <td>8</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>autoCreateTopicEnable</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>clusterTopicEnable</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>brokerTopicEnable</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>autoCreateSubscriptionGroup</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>messageStorePlugIn</td>
+        <td>class java.lang.String</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>msgTraceTopicName</td>
+        <td>class java.lang.String</td>
+        <td>TopicValidator.RMQ_SYS_TRACE_TOPIC</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>traceTopicEnable</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>sendMessageThreadPoolNums</td>
+        <td>int</td>
+        <td>1</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>pullMessageThreadPoolNums</td>
+        <td>int</td>
+        <td>32</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>processReplyMessageThreadPoolNums</td>
+        <td>int</td>
+        <td>32</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>queryMessageThreadPoolNums</td>
+        <td>int</td>
+        <td>16</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>adminBrokerThreadPoolNums</td>
+        <td>int</td>
+        <td>16</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>clientManageThreadPoolNums</td>
+        <td>int</td>
+        <td>32</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>consumerManageThreadPoolNums</td>
+        <td>int</td>
+        <td>32</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>heartbeatThreadPoolNums</td>
+        <td>int</td>
+        <td>8</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>endTransactionThreadPoolNums</td>
+        <td>int</td>
+        <td>24</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>flushConsumerOffsetInterval</td>
+        <td>int</td>
+        <td>5000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>flushConsumerOffsetHistoryInterval</td>
+        <td>int</td>
+        <td>60000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>rejectTransactionMessage</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>fetchNamesrvAddrByAddressServer</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>sendThreadPoolQueueCapacity</td>
+        <td>int</td>
+        <td>10000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>pullThreadPoolQueueCapacity</td>
+        <td>int</td>
+        <td>100000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>replyThreadPoolQueueCapacity</td>
+        <td>int</td>
+        <td>10000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>queryThreadPoolQueueCapacity</td>
+        <td>int</td>
+        <td>20000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>clientManagerThreadPoolQueueCapacity</td>
+        <td>int</td>
+        <td>1000000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>consumerManagerThreadPoolQueueCapacity</td>
+        <td>int</td>
+        <td>1000000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>heartbeatThreadPoolQueueCapacity</td>
+        <td>int</td>
+        <td>50000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>endTransactionPoolQueueCapacity</td>
+        <td>int</td>
+        <td>100000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>filterServerNums</td>
+        <td>int</td>
+        <td>0</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>longPollingEnable</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>shortPollingTimeMills</td>
+        <td>long</td>
+        <td>1000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>notifyConsumerIdsChangedEnable</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>highSpeedMode</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>commercialEnable</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>commercialTimerCount</td>
+        <td>int</td>
+        <td>1</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>commercialTransCount</td>
+        <td>int</td>
+        <td>1</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>commercialBigCount</td>
+        <td>int</td>
+        <td>1</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>commercialBaseCount</td>
+        <td>int</td>
+        <td>1</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>transferMsgByHeap</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>maxDelayTime</td>
+        <td>int</td>
+        <td>40</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>regionId</td>
+        <td>class java.lang.String</td>
+        <td>MixAll.DEFAULT_TRACE_REGION_ID</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>registerBrokerTimeoutMills</td>
+        <td>int</td>
+        <td>6000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>slaveReadEnable</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>disableConsumeIfConsumerReadSlowly</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>consumerFallbehindThreshold</td>
+        <td>long</td>
+        <td>17179869184</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>brokerFastFailureEnable</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>waitTimeMillsInSendQueue</td>
+        <td>long</td>
+        <td>200</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>waitTimeMillsInPullQueue</td>
+        <td>long</td>
+        <td>5000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>waitTimeMillsInHeartbeatQueue</td>
+        <td>long</td>
+        <td>31000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>waitTimeMillsInTransactionQueue</td>
+        <td>long</td>
+        <td>3000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>startAcceptSendRequestTimeStamp</td>
+        <td>long</td>
+        <td>0</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>traceOn</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>enableCalcFilterBitMap</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>expectConsumerNumUseFilter</td>
+        <td>int</td>
+        <td>32</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>maxErrorRateOfBloomFilter</td>
+        <td>int</td>
+        <td>20</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>filterDataCleanTimeSpan</td>
+        <td>long</td>
+        <td>86400000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>filterSupportRetry</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>enablePropertyFilter</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>compressedRegister</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>forceRegister</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>registerNameServerPeriod</td>
+        <td>int</td>
+        <td>30000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>transactionTimeOut</td>
+        <td>long</td>
+        <td>6000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>transactionCheckMax</td>
+        <td>int</td>
+        <td>15</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>transactionCheckInterval</td>
+        <td>long</td>
+        <td>60000</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>aclEnable</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>storeReplyMessageEnable</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>autoDeleteUnusedStats</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td></td>
+    </tr>
+</table></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">xxnjdg</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://xxnjdg.github.io/2021/02/15/rocketmq-1/">https://xxnjdg.github.io/2021/02/15/rocketmq-1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/rocketmq/">rocketmq</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/03/13/redis-1/"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">极客时间-Redis核心技术与实战笔记</div></div></a></div><div class="next-post pull-right"><a href="/2021/02/10/nacos-5/"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">nacos注册中心集群笔记2</div></div></a></div></nav></div><div class="aside_content" id="aside_content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><img class="avatar-img" src="/null" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">xxnjdg</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">15</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">5</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxnjdg"><i class="fab fa-github"></i><span>Follow Me</span></a></div></div><div class="card-widget card-announcement"><div class="card-content"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="card-content"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#org-apache-rocketmq-namesrv-NamesrvStartup"><span class="toc-number">1.</span> <span class="toc-text">org.apache.rocketmq.namesrv.NamesrvStartup</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1"><span class="toc-number">1.1.</span> <span class="toc-text">定时任务</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Broker"><span class="toc-number">2.</span> <span class="toc-text">Broker</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1-1"><span class="toc-number">2.1.</span> <span class="toc-text">定时任务</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#org-apache-rocketmq-common-namesrv-NamesrvConfig"><span class="toc-number">3.</span> <span class="toc-text">org.apache.rocketmq.common.namesrv.NamesrvConfig</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#org-apache-rocketmq-remoting-netty-NettyServerConfig"><span class="toc-number">4.</span> <span class="toc-text">org.apache.rocketmq.remoting.netty.NettyServerConfig</span></a></li></ol></div></div></div><div class="card-widget card-recent-post"><div class="card-content"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/06/20/elasticsearch-3-1/" title="elasticsearch-3"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="elasticsearch-3"/></a><div class="content"><a class="title" href="/2021/06/20/elasticsearch-3-1/" title="elasticsearch-3">elasticsearch-3</a><time datetime="2021-06-20T14:34:24.000Z" title="Created 2021-06-20 22:34:24">2021-06-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/07/elasticsearch-3/" title="elasticsearch-3"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="elasticsearch-3"/></a><div class="content"><a class="title" href="/2021/05/07/elasticsearch-3/" title="elasticsearch-3">elasticsearch-3</a><time datetime="2021-05-07T05:20:36.000Z" title="Created 2021-05-07 13:20:36">2021-05-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/04/elasticsearch-2/" title="elasticsearch数据写入"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="elasticsearch数据写入"/></a><div class="content"><a class="title" href="/2021/05/04/elasticsearch-2/" title="elasticsearch数据写入">elasticsearch数据写入</a><time datetime="2021-05-04T11:42:00.000Z" title="Created 2021-05-04 19:42:00">2021-05-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/03/23/elasticsearch-1/" title="调试elasticsearch源码笔记"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="调试elasticsearch源码笔记"/></a><div class="content"><a class="title" href="/2021/03/23/elasticsearch-1/" title="调试elasticsearch源码笔记">调试elasticsearch源码笔记</a><time datetime="2021-03-22T18:21:43.000Z" title="Created 2021-03-23 02:21:43">2021-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/03/13/redis-1/" title="极客时间-Redis核心技术与实战笔记"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="极客时间-Redis核心技术与实战笔记"/></a><div class="content"><a class="title" href="/2021/03/13/redis-1/" title="极客时间-Redis核心技术与实战笔记">极客时间-Redis核心技术与实战笔记</a><time datetime="2021-03-13T06:42:38.000Z" title="Created 2021-03-13 14:42:38">2021-03-13</time></div></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By xxnjdg</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script></div></body></html>
